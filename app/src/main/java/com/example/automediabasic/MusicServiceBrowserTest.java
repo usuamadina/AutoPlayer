@@ -49,7 +49,35 @@ public class MusicServiceBrowserTest extends MediaBrowserService {
                 handlePlay();
             }
 
+            @Override
+            public void onSkipToNext() {
+                super.onSkipToNext();
+                int currentIndex = mMusic.indexOf(mCurrentTrack);
+                Log.e("onSkipToNext()","click" + currentIndex);
+                if(currentIndex < mMusic.size()-1){
+                    currentIndex++;
+                }
+                else currentIndex = 0;
+                mCurrentTrack = mMusic.get(currentIndex);
+                mSession.setPlaybackState(buildState(PlaybackState.STATE_SKIPPING_TO_NEXT));
+                handlePlay();
+            }
 
+            @Override
+            public void onSkipToPrevious() {
+                super.onSkipToPrevious();
+                Log.e("onSkipToPrevious()","click");
+                int currentIndex = mMusic.indexOf(mCurrentTrack);
+                Log.e("onSkipToNext()","click" + currentIndex);
+                if(currentIndex ==0){
+                    currentIndex = mMusic.size()-1;
+                }
+                else currentIndex--;
+                mCurrentTrack = mMusic.get(currentIndex);
+                mSession.setPlaybackState(buildState(PlaybackState.STATE_SKIPPING_TO_NEXT));
+                handlePlay();
+
+            }
 
             @Override
             public void onPlay() {
