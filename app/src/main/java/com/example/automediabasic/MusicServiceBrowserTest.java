@@ -14,6 +14,8 @@ import android.os.SystemClock;
 import android.service.media.MediaBrowserService;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +30,8 @@ public class MusicServiceBrowserTest extends MediaBrowserService {
     @Override
     public void onCreate() {
         super.onCreate();
-        mMusic = new ArrayList<MediaMetadata>(); //Añadimos 3 canciones desde la librería de audio de youtube
+        mMusic = new ArrayList<MediaMetadata>();
+        //Añadimos 3 canciones desde la librería de audio de youtube
         mMusic.add(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_MEDIA_ID, "https://www.youtube.com/audiolibrary_download?vid=f5cfb6bd8c048b98").putString(MediaMetadata.METADATA_KEY_TITLE, "Primera canción").putString(MediaMetadata.METADATA_KEY_ARTIST, "Artista 1").putLong(MediaMetadata.METADATA_KEY_DURATION, 109000).build());
         mMusic.add(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_MEDIA_ID, "https://www.youtube.com/audiolibrary_download?vid=ac7a38f4a568229c").putString(MediaMetadata.METADATA_KEY_TITLE, "Segunda canción").putString(MediaMetadata.METADATA_KEY_ARTIST, "Artista 2").putLong(MediaMetadata.METADATA_KEY_DURATION, 65000).build());
         mMusic.add(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_MEDIA_ID, "https://www.youtube.com/audiolibrary_download?vid=456229530454affd").putString(MediaMetadata.METADATA_KEY_TITLE, "Tercera canción").putString(MediaMetadata.METADATA_KEY_ARTIST, "Artista 3").putLong(MediaMetadata.METADATA_KEY_DURATION, 121000).build());
@@ -45,6 +48,8 @@ public class MusicServiceBrowserTest extends MediaBrowserService {
                 }
                 handlePlay();
             }
+
+
 
             @Override
             public void onPlay() {
@@ -69,7 +74,13 @@ public class MusicServiceBrowserTest extends MediaBrowserService {
     }
 
     private PlaybackState buildState(int state) {
-        return new PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_SKIP_TO_PREVIOUS | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_PLAY_FROM_MEDIA_ID | PlaybackState.ACTION_PLAY_PAUSE).setState(state, mPlayer.getCurrentPosition(), 1, SystemClock.elapsedRealtime()).build();
+        return new PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY |
+                PlaybackState.ACTION_SKIP_TO_PREVIOUS |
+                PlaybackState.ACTION_SKIP_TO_NEXT |
+                PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
+                PlaybackState.ACTION_PLAY_PAUSE)
+                .setState(state, mPlayer.getCurrentPosition(), 1, SystemClock.elapsedRealtime())
+                .build();
     }
 
     private void handlePlay() {
@@ -78,10 +89,20 @@ public class MusicServiceBrowserTest extends MediaBrowserService {
         mSession.setMetadata(mCurrentTrack);
         try {
             mPlayer.reset();
+            mPlayer.seekTo(0);
             mPlayer.setDataSource(MusicServiceBrowserTest.this, Uri.parse(mCurrentTrack.getDescription().getMediaId()));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.seekTo(0);
+                mSession.setPlaybackState(buildState(PlaybackState.STATE_STOPPED));
+            }
+        });
+
         mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
