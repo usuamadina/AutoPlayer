@@ -1,7 +1,6 @@
 package com.example.automediabasic;
 
-import android.app.Service;
-import android.content.Intent;
+
 import android.media.MediaMetadata;
 import android.media.MediaPlayer;
 import android.media.browse.MediaBrowser;
@@ -9,13 +8,12 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
+
 import android.os.SystemClock;
 import android.service.media.MediaBrowserService;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
 import android.util.Log;
-import android.widget.Toast;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
